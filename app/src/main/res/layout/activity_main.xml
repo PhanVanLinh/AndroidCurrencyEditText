@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.toong.androidcurrencyedittext.MainActivity"
+    android:orientation="vertical"
+    android:focusableInTouchMode="true"
+    >
+    <!-- Add android:focusableInTouchMode="true" to make edittext not focus when startup -->
+    <!--https://stackoverflow.com/a/1612017/5381331-->
+
+    <!--<EditText-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--/>-->
+
+    <com.toong.androidcurrencyedittext.CurrencyEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+</LinearLayout>
