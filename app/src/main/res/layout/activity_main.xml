@@ -12,12 +12,13 @@
     <!-- Add android:focusableInTouchMode="true" to make edittext not focus when startup -->
     <!--https://stackoverflow.com/a/1612017/5381331-->
 
-    <!--<EditText-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--/>-->
 
     <com.toong.androidcurrencyedittext.CurrencyEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
