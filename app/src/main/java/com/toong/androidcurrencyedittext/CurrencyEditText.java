@@ -2,6 +2,7 @@ package com.toong.androidcurrencyedittext;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -17,14 +18,11 @@ import java.util.Locale;
 /**
  * Created by PhanVanLinh on 25/07/2017.
  * phanvanlinh.94vn@gmail.com
- *
- * Some note <br/>
- * <li>Always use locale US instead of default to make DecimalFormat work well in all language</li>
  */
-public class CurrencyEditText extends android.support.v7.widget.AppCompatEditText {
-    private static String prefix = "VND ";
+public class CurrencyEditText extends AppCompatEditText {
+    private static String prefix = "VD5N ";
     private static final int MAX_LENGTH = 20;
-    private static final int MAX_DECIMAL = 3;
+    private static final int MAX_DECIMAL_DIGIT = 3;
     private CurrencyTextWatcher currencyTextWatcher = new CurrencyTextWatcher(this, prefix);
 
     public CurrencyEditText(Context context) {
@@ -72,12 +70,17 @@ public class CurrencyEditText extends android.support.v7.widget.AppCompatEditTex
 
     private static class CurrencyTextWatcher implements TextWatcher {
         private final EditText editText;
-        private String previousCleanString;
+        private String previousNumber;
         private String prefix;
+        DecimalFormat integerFormatter;
 
+        /**
+         * I always use locale US instead of default to make DecimalFormat work well in all language
+         */
         CurrencyTextWatcher(EditText editText, String prefix) {
             this.editText = editText;
             this.prefix = prefix;
+            integerFormatter = new DecimalFormat("#,###.###", new DecimalFormatSymbols(Locale.US));
         }
 
         @Override
@@ -101,40 +104,40 @@ public class CurrencyEditText extends android.support.v7.widget.AppCompatEditTex
             if (str.equals(prefix)) {
                 return;
             }
-            // cleanString this the string which not contain prefix and ,
-            String cleanString = str.replace(prefix, "").replaceAll("[,]", "");
+            // number this the string which not contain prefix and ,
+            String number = str.replace(prefix, "").replaceAll("[,]", "");
             // for prevent afterTextChanged recursive call
-            if (cleanString.equals(previousCleanString) || cleanString.isEmpty()) {
+            if (number.equals(previousNumber) || number.isEmpty()) {
                 return;
             }
-            previousCleanString = cleanString;
+            previousNumber = number;
 
-            String formattedString;
-            if (cleanString.contains(".")) {
-                formattedString = formatDecimal(cleanString);
-            } else {
-                formattedString = formatInteger(cleanString);
-            }
+            String formattedString = prefix + formatNumber(number);
             editText.removeTextChangedListener(this); // Remove listener
             editText.setText(formattedString);
             handleSelection();
             editText.addTextChangedListener(this); // Add back the listener
         }
 
+        private String formatNumber(String number) {
+            if (number.contains(".")) {
+                return formatDecimal(number);
+            }
+            return formatInteger(number);
+        }
+
         private String formatInteger(String str) {
             BigDecimal parsed = new BigDecimal(str);
-            DecimalFormat formatter =
-                    new DecimalFormat(prefix + "#,###", new DecimalFormatSymbols(Locale.US));
-            return formatter.format(parsed);
+            return integerFormatter.format(parsed);
         }
 
         private String formatDecimal(String str) {
             if (str.equals(".")) {
-                return prefix + ".";
+                return ".";
             }
             BigDecimal parsed = new BigDecimal(str);
             // example pattern VND #,###.00
-            DecimalFormat formatter = new DecimalFormat(prefix + "#,###." + getDecimalPattern(str),
+            DecimalFormat formatter = new DecimalFormat("#,###." + getDecimalPattern(str),
                     new DecimalFormatSymbols(Locale.US));
             formatter.setRoundingMode(RoundingMode.DOWN);
             return formatter.format(parsed);
@@ -147,7 +150,7 @@ public class CurrencyEditText extends android.support.v7.widget.AppCompatEditTex
         private String getDecimalPattern(String str) {
             int decimalCount = str.length() - str.indexOf(".") - 1;
             StringBuilder decimalPattern = new StringBuilder();
-            for (int i = 0; i < decimalCount && i < MAX_DECIMAL; i++) {
+            for (int i = 0; i < decimalCount && i < MAX_DECIMAL_DIGIT; i++) {
                 decimalPattern.append("0");
             }
             return decimalPattern.toString();
